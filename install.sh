@@ -30,6 +30,18 @@ systemctl daemon-reload
 systemctl enable prometheus
 systemctl start prometheus 
 #
+# install node_exporter
+wget https://github.com/prometheus/node_exporter/releases/download/v1.4.0/node_exporter-1.4.0.linux-amd64.tar.gz
+tar -xf node_exporter-1.4.0.linux-amd64.tar.gz
+sudo mv node_exporter-1.4.0.linux-amd64/node_exporter /usr/local/bin
+rm -r node_exporter-1.4.0.linux-amd64*
+# write the service ???
+#
+# restart service
+systemctl daemon-reload
+systemctl enable node_exporter
+systemctl start node_exporter
+#
 # install grafana
 wget -q -O /usr/share/keyrings/grafana.key https://packages.grafana.com/gpg.key
 echo "deb [signed-by=/usr/share/keyrings/grafana.key] https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
@@ -37,4 +49,3 @@ apt-get update
 apt-get install grafana
 systemctl start grafana-server 
 systemctl enable grafana-server.service
-
