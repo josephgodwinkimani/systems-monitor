@@ -1,6 +1,6 @@
 #!/bin/bash
 # unattended installation - run baby run
-# creating Prometheus System Users and Directory
+# creating Prometheus System Users and Directory (node_exporter and prometheus)
 sudo useradd --no-create-home --shell /bin/false prometheus && useradd --no-create-home --shell /bin/false node_exporter
 sudo mkdir /etc/prometheus
 sudo mkdir /var/lib/prometheus
@@ -17,35 +17,47 @@ sudo chown prometheus:prometheus /usr/local/bin/prometheus
 sudo chown prometheus:prometheus /usr/local/bin/promtool
 #
 # copy Prometheus Console Libraries
-cp -r /opt/prometheus-2.37.2.linux-amd64/consoles /etc/prometheus
-cp -r /opt/prometheus-2.37.2.linux-amd64/console_libraries /etc/prometheus
-cp -r /opt/prometheus-2.37.2.linux-amd64/prometheus.yml /etc/prometheus
+sudo cp -r /opt/prometheus-2.37.2.linux-amd64/consoles /etc/prometheus
+sudo cp -r /opt/prometheus-2.37.2.linux-amd64/console_libraries /etc/prometheus
+sudo cp -r /opt/prometheus-2.37.2.linux-amd64/prometheus.yml /etc/prometheus
 #
-chown -R prometheus:prometheus /etc/prometheus/consoles
-chown -R prometheus:prometheus /etc/prometheus/console_libraries
-chown -R prometheus:prometheus /etc/prometheus/prometheus.yml
+sudo chown -R prometheus:prometheus /etc/prometheus/consoles
+sudo chown -R prometheus:prometheus /etc/prometheus/console_libraries
+sudo chown -R prometheus:prometheus /etc/prometheus/prometheus.yml
 # confirm installation
-cat /etc/prometheus/prometheus.yml
-systemctl daemon-reload
-systemctl enable prometheus
-systemctl start prometheus 
+sudo cat /etc/prometheus/prometheus.yml
+sudo systemctl daemon-reload
+sudo systemctl enable prometheus
+sudo systemctl start prometheus 
 #
 # install node_exporter
 wget https://github.com/prometheus/node_exporter/releases/download/v1.4.0/node_exporter-1.4.0.linux-amd64.tar.gz
 tar -xf node_exporter-1.4.0.linux-amd64.tar.gz
 sudo mv node_exporter-1.4.0.linux-amd64/node_exporter /usr/local/bin
-rm -r node_exporter-1.4.0.linux-amd64*
-# write the service ???
+sudo rm -r node_exporter-1.4.0.linux-amd64*
+sudo tee /etc/systemd/system/node_exporter.service <<"EOF"
+[Unit]
+Description=Node Exporter
+
+[Service]
+User=node_exporter
+Group=node_exporter
+EnvironmentFile=-/etc/sysconfig/node_exporter
+ExecStart=/usr/local/bin/node_exporter $OPTIONS
+
+[Install]
+WantedBy=multi-user.target
+EOF
 #
 # restart service
-systemctl daemon-reload
-systemctl enable node_exporter
-systemctl start node_exporter
+sudo systemctl daemon-reload
+sudo systemctl enable node_exporter
+sudo systemctl start node_exporter
 #
 # install grafana
 wget -q -O /usr/share/keyrings/grafana.key https://packages.grafana.com/gpg.key
 echo "deb [signed-by=/usr/share/keyrings/grafana.key] https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
-apt-get update
-apt-get install grafana
-systemctl start grafana-server 
-systemctl enable grafana-server.service
+sudo apt-get update
+sudo apt-get install grafana
+sudo systemctl start grafana-server 
+sudo systemctl enable grafana-server.service
