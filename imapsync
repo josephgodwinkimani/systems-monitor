@@ -40,10 +40,10 @@ libtest-warn-perl       \
 make                    \
 time                    \
 cpanminus
-# using CPAN get required Python modules
-sudo cpanm Mail::IMAPClient JSON::WebToken Test::MockObject 
+# using CPAN get required Python modules --force
+sudo cpanm Mail::IMAPClient JSON::WebToken Test::MockObject --force
 sudo cpanm Crypt::OpenSSL::RSA Crypt::OpenSSL::Random --force
-sudo cpanm Unicode::String Data::Uniqid
+sudo cpanm Unicode::String Data::Uniqid --force
 # get latest copy
 wget https://github.com/imapsync/imapsync/archive/refs/tags/imapsync-2.229.tar.gz
 tar xzvf imapsync-2.229.tar.gz
