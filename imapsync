@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # install imapsync dependencies
 sudo apt-get install  \
 libauthen-ntlm-perl     \
